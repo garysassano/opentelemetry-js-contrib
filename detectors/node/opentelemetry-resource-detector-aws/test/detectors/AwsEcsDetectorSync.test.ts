@@ -20,25 +20,24 @@ import * as sinon from 'sinon';
 import { awsEcsDetectorSync, AwsEcsDetectorSync } from '../../src';
 import {
   assertEmptyResource,
-  assertCloudResource,
   assertContainerResource,
 } from '@opentelemetry/contrib-test-utils';
 import { Resource } from '@opentelemetry/resources';
 import {
-  SEMRESATTRS_CLOUD_PLATFORM,
-  SEMRESATTRS_AWS_ECS_CONTAINER_ARN,
-  SEMRESATTRS_AWS_ECS_CLUSTER_ARN,
-  SEMRESATTRS_AWS_ECS_LAUNCHTYPE,
-  SEMRESATTRS_AWS_ECS_TASK_ARN,
-  SEMRESATTRS_AWS_ECS_TASK_REVISION,
-  SEMRESATTRS_AWS_ECS_TASK_FAMILY,
-  SEMRESATTRS_AWS_LOG_GROUP_NAMES,
-  SEMRESATTRS_AWS_LOG_GROUP_ARNS,
-  SEMRESATTRS_AWS_LOG_STREAM_NAMES,
-  SEMRESATTRS_AWS_LOG_STREAM_ARNS,
-  CLOUDPROVIDERVALUES_AWS,
-  CLOUDPLATFORMVALUES_AWS_ECS,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_CLOUD_PLATFORM,
+  ATTR_AWS_ECS_CONTAINER_ARN,
+  ATTR_AWS_ECS_CLUSTER_ARN,
+  ATTR_AWS_ECS_LAUNCHTYPE,
+  ATTR_AWS_ECS_TASK_ARN,
+  ATTR_AWS_ECS_TASK_REVISION,
+  ATTR_AWS_ECS_TASK_FAMILY,
+  ATTR_AWS_LOG_GROUP_NAMES,
+  ATTR_AWS_LOG_GROUP_ARNS,
+  ATTR_AWS_LOG_STREAM_NAMES,
+  ATTR_AWS_LOG_STREAM_ARNS,
+  CLOUD_PROVIDER_VALUE_AWS,
+  CLOUD_PLATFORM_VALUE_AWS_ECS,
+} from '../../src/semconv';
 // Patch until the OpenTelemetry SDK is updated to ship this attribute
 import { SemanticResourceAttributes as AdditionalSemanticResourceAttributes } from '../../src/detectors/SemanticResourceAttributes';
 import { readFileSync } from 'fs';
@@ -65,19 +64,32 @@ const assertEcsResource = (
   resource: Resource,
   validations: EcsResourceAttributes
 ) => {
-  assertCloudResource(resource, {
-    provider: CLOUDPROVIDERVALUES_AWS,
-    accountId: validations.accountId,
-    region: validations.region,
-    zone: validations.zone,
-  });
   assert.strictEqual(
-    resource.attributes[SEMRESATTRS_CLOUD_PLATFORM],
-    CLOUDPLATFORMVALUES_AWS_ECS
+    resource.attributes['cloud.provider'],
+    CLOUD_PROVIDER_VALUE_AWS
+  );
+  if (validations.accountId) {
+    assert.strictEqual(
+      resource.attributes['cloud.account.id'],
+      validations.accountId
+    );
+  }
+  if (validations.region) {
+    assert.strictEqual(resource.attributes['cloud.region'], validations.region);
+  }
+  if (validations.zone) {
+    assert.strictEqual(
+      resource.attributes['cloud.availability_zone'],
+      validations.zone
+    );
+  }
+  assert.strictEqual(
+    resource.attributes[ATTR_CLOUD_PLATFORM],
+    CLOUD_PLATFORM_VALUE_AWS_ECS
   );
   if (validations.containerArn)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_CONTAINER_ARN],
+      resource.attributes[ATTR_AWS_ECS_CONTAINER_ARN],
       validations.containerArn
     );
   assert.strictEqual(
@@ -86,47 +98,47 @@ const assertEcsResource = (
   );
   if (validations.clusterArn)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_CLUSTER_ARN],
+      resource.attributes[ATTR_AWS_ECS_CLUSTER_ARN],
       validations.clusterArn
     );
   if (validations.launchType)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_LAUNCHTYPE],
+      resource.attributes[ATTR_AWS_ECS_LAUNCHTYPE],
       validations.launchType
     );
   if (validations.taskArn)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_TASK_ARN],
+      resource.attributes[ATTR_AWS_ECS_TASK_ARN],
       validations.taskArn
     );
   if (validations.taskFamily)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_TASK_FAMILY],
+      resource.attributes[ATTR_AWS_ECS_TASK_FAMILY],
       validations.taskFamily
     );
   if (validations.taskRevision)
     assert.strictEqual(
-      resource.attributes[SEMRESATTRS_AWS_ECS_TASK_REVISION],
+      resource.attributes[ATTR_AWS_ECS_TASK_REVISION],
       validations.taskRevision
     );
   if (validations.logGroupNames)
     assert.deepEqual(
-      resource.attributes[SEMRESATTRS_AWS_LOG_GROUP_NAMES],
+      resource.attributes[ATTR_AWS_LOG_GROUP_NAMES],
       validations.logGroupNames
     );
   if (validations.logGroupArns)
     assert.deepEqual(
-      resource.attributes[SEMRESATTRS_AWS_LOG_GROUP_ARNS],
+      resource.attributes[ATTR_AWS_LOG_GROUP_ARNS],
       validations.logGroupArns
     );
   if (validations.logStreamNames)
     assert.deepEqual(
-      resource.attributes[SEMRESATTRS_AWS_LOG_STREAM_NAMES],
+      resource.attributes[ATTR_AWS_LOG_STREAM_NAMES],
       validations.logStreamNames
     );
   if (validations.logStreamArns)
     assert.deepEqual(
-      resource.attributes[SEMRESATTRS_AWS_LOG_STREAM_ARNS],
+      resource.attributes[ATTR_AWS_LOG_STREAM_ARNS],
       validations.logStreamArns
     );
 };

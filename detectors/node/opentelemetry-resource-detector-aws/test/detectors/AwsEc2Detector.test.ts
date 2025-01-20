@@ -18,10 +18,14 @@ import * as nock from 'nock';
 import * as assert from 'assert';
 
 import { awsEc2Detector, awsEc2DetectorSync } from '../../src';
+import { assertHostResource } from '@opentelemetry/contrib-test-utils';
 import {
-  assertCloudResource,
-  assertHostResource,
-} from '@opentelemetry/contrib-test-utils';
+  CLOUD_PROVIDER_VALUE_AWS,
+  ATTR_CLOUD_PROVIDER,
+  ATTR_CLOUD_REGION,
+  ATTR_CLOUD_ACCOUNT_ID,
+  ATTR_CLOUD_AVAILABILITY_ZONE,
+} from '../../src/semconv';
 
 const AWS_HOST = 'http://' + awsEc2DetectorSync.AWS_IDMS_ENDPOINT;
 const AWS_TOKEN_PATH = awsEc2DetectorSync.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
@@ -72,12 +76,20 @@ describe('awsEc2Detector', () => {
 
       assert.ok(resource);
 
-      assertCloudResource(resource, {
-        provider: 'aws',
-        accountId: 'my-account-id',
-        region: 'my-region',
-        zone: 'my-zone',
-      });
+      assert.strictEqual(
+        resource.attributes[ATTR_CLOUD_PROVIDER],
+        CLOUD_PROVIDER_VALUE_AWS
+      );
+      assert.strictEqual(
+        resource.attributes[ATTR_CLOUD_ACCOUNT_ID],
+        'my-account-id'
+      );
+      assert.strictEqual(resource.attributes[ATTR_CLOUD_REGION], 'my-region');
+      assert.strictEqual(
+        resource.attributes[ATTR_CLOUD_AVAILABILITY_ZONE],
+        'my-zone'
+      );
+
       assertHostResource(resource, {
         id: 'my-instance-id',
         hostType: 'my-instance-type',

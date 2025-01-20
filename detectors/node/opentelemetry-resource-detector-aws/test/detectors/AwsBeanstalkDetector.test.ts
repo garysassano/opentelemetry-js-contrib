@@ -21,7 +21,7 @@ import {
   assertEmptyResource,
   assertServiceResource,
 } from '@opentelemetry/contrib-test-utils';
-import { CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK } from '@opentelemetry/semantic-conventions';
+import { CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK } from '../../src/semconv';
 
 describe('BeanstalkResourceDetector', () => {
   const err = new Error('failed to read config file');
@@ -59,7 +59,7 @@ describe('BeanstalkResourceDetector', () => {
     sinon.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
-      name: CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
+      name: CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK,
       namespace: 'scorekeep',
       version: 'app-5a56-170119_190650-stage-170119_190650',
       instanceId: '32',
@@ -82,7 +82,7 @@ describe('BeanstalkResourceDetector', () => {
     sinon.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
-      name: CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
+      name: CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK,
       namespace: 'scorekeep',
       version: 'app-5a56-170119_190650-stage-170119_190650',
       instanceId: '32',

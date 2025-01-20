@@ -15,12 +15,15 @@
  */
 
 import * as assert from 'assert';
-import {
-  assertCloudResource,
-  assertEmptyResource,
-} from '@opentelemetry/contrib-test-utils';
-
+import { assertEmptyResource } from '@opentelemetry/contrib-test-utils';
 import { awsLambdaDetectorSync } from '../../src';
+import {
+  CLOUD_PROVIDER_VALUE_AWS,
+  ATTR_CLOUD_PROVIDER,
+  ATTR_CLOUD_REGION,
+  ATTR_FAAS_NAME,
+  ATTR_FAAS_VERSION,
+} from '../../src/semconv';
 
 describe('awsLambdaDetectorSync', () => {
   let oldEnv: NodeJS.ProcessEnv;
@@ -41,13 +44,13 @@ describe('awsLambdaDetectorSync', () => {
 
       const resource = awsLambdaDetectorSync.detect();
 
-      assertCloudResource(resource, {
-        provider: 'aws',
-        region: 'us-east-1',
-      });
-
-      assert.strictEqual(resource.attributes['faas.name'], 'name');
-      assert.strictEqual(resource.attributes['faas.version'], 'v1');
+      assert.strictEqual(
+        resource.attributes[ATTR_CLOUD_PROVIDER],
+        CLOUD_PROVIDER_VALUE_AWS
+      );
+      assert.strictEqual(resource.attributes[ATTR_CLOUD_REGION], 'us-east-1');
+      assert.strictEqual(resource.attributes[ATTR_FAAS_NAME], 'name');
+      assert.strictEqual(resource.attributes[ATTR_FAAS_VERSION], 'v1');
     });
   });
 
